@@ -1,0 +1,50 @@
+<%- include('partials/header.ejs') %> 
+<%- include('partials/navbar.ejs') %>
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h1>Cadastrar Pedidos</h1>
+            <hr>
+            <form action="createOrder" method="POST">
+                <label for="">Pedido</label>
+                <input type="text" name="code" id="code" placeholder="Insira o código do pedido" class="form-control">
+
+                <label for="">Total</label>
+                <input type="text" name="total" id="total" placeholder="Insira o total da Compra" class="form-control">
+
+                <br>
+                <button class="btn btn-success">Cadastrar</button>
+            </form>
+            <hr>
+        </div>
+    </div>
+</div>
+
+   <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1>Pedidos</h1>
+            </div>
+            <div class="card-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Número:</th>
+                            <th>Valor:</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% orders.forEach(order => { %>
+                        <tr>
+                            <td><%= order.code %></td>
+                            <td><%= order.total.toLocaleString('pt-br', {style: 'currency', currency: 'BRL'}) %></td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer.ejs') %>

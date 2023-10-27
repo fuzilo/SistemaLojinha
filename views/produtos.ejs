@@ -1,0 +1,59 @@
+<%- include('partials/header.ejs') %> 
+<%- include('partials/navbar.ejs') %>
+
+<div class="container">
+    <div class ="card">
+        <div class="card-header">
+            <h1>Cadastrar Produtos</h1>
+            <hr>
+            <form method="POST" action="createProduct">
+                <label> Produto</label>
+                <input type="text" name="name" id="name" placeholder="Insira o nome do produto" class="form-control">
+
+                <label for="">Preço</label>
+                <input type="text" name="price" id="price" placeholder="Insira o preço unitário" class="form-control">
+
+                <label for="">Categoria</label>
+                <input type="text" name="category" id="category" placeholder="Defina a categoria do produto" class="form-control">
+
+                <br>
+                <button class="btn btn-success">Cadastrar</button>
+            </form>
+            <hr>
+        </div>
+    </div>
+</div>
+<br>
+
+
+
+
+   <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1>Produtos</h1>
+            </div>
+            <div class="card-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Produto:</th>
+                            <th>Preço:</th>
+                            <th>Categoria:</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% products.forEach(product => { %>
+                        <tr>
+                            <td><%= product.name %></td>
+                            <td><%= product.price.toLocaleString('pt-br', {style: 'currency', currency: 'BRL'}) %></td>
+                            <td><%= product.category %></td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer.ejs') %>
