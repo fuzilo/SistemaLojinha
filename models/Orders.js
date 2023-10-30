@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 
 const order = new mongoose.Schema(
     {
-        code: String,
-        total:String
+        code: Number,
+        total: Number
     }
 )
 

@@ -8,8 +8,8 @@ class OrderService{
     Create(code, total){
         const newOrder = new Order(
             {
-                code:String,
-                total:String
+                code:code,
+                total:total
                 //Estou criando os valores como string mesmo, depois alteramos, já que teremos de alterar as regras de negócio, interligando produto,cliente e pedido
             }
         )
