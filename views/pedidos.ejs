@@ -38,7 +38,8 @@
                         <% orders.forEach(order => { %>
                         <tr>
                             <td><%= order.code %></td>
-                            <td><%= order.total.toLocaleString('pt-br', {style: 'currency', currency: 'BRL'}) %></td>
+                            
+                            <td><%= order.total%></td>
                         </tr>
                         <% }) %>
                     </tbody>
@@ -48,3 +49,5 @@
     </div>
 
     <%- include('partials/footer.ejs') %>
+    
+ 
