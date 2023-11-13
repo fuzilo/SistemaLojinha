@@ -21,6 +21,30 @@ class ProductService{
         const products = Product.find()
         return products
     }
+    GetOne(id) {
+        const products = Product.findOne({_id: id})
+        return products
+    }
+
+    Delete(id) {
+        Product.findByIdAndDelete(id).then(() => {
+            console.log(`Produto com a id: ${id} foi deletado.`)
+        }).catch(err => {
+            console.log(err)
+        })
+    }
+
+    Update(id, name,price,category) {
+        Product.findByIdAndUpdate(id, {
+                name:name,
+                price:price,
+                category:category
+        }).then(() => {
+            console.log(`Dados do produto com id: ${id} alterados com sucesso.`)
+        }).catch(err => {
+            console.log(err)
+        })
+    }
 }
 
 export default new ProductService()

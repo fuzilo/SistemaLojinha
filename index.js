@@ -5,6 +5,10 @@ import mongoose from 'mongoose'
 
 //importando o body parser
 import bodyParser from 'body-parser'
+//inportar a classe service
+import ClientService from './services/ClientService.js'
+import OrderService from './services/OrderService.js'
+import ProductService from './services/ProductService.js'
 
 //decodifica dados recebidos por formulários
 app.use(bodyParser.urlencoded({extended:false}))
@@ -15,10 +19,6 @@ app.use(bodyParser.json())
 //criando conexão com o banco
 mongoose.connect("mongodb://127.0.0.1:27017/loja", {useNewUrlParser:true, useUnifiedTopology:true}) 
 
-//inportar a classe service
-import ClientService from './services/ClientService.js'
-import OrderService from './services/OrderService.js'
-import ProductService from './services/ProductService.js'
 
 // Define o EJS como Renderizador de páginas
 app.set('view engine', 'ejs')
@@ -52,6 +52,33 @@ app.post("/createClient",(req, res) => {
     res.redirect("/clientes")
 })
 
+//Criando Rota do tipo Find Client
+app.get("/findClient/:id", (req, res) => {
+    const id = req.params.id
+    ClientService.GetOne(id).then(Client => {
+        res.render("dadoscliente", {
+            Client : Client
+        })
+    })
+})
+
+//Criando Rota do tipo Update Client
+app.post("/updateClient/:id", (req, res) => {
+    ClientService.Update(
+        req.body.id,
+        req.body.name,
+        req.body.cpf,
+        req.body.address
+    )
+    res.redirect("/clientes")
+})
+
+//Criando Rota do Tipo Delete Client
+app.get("/deleteClient/:id", (req, res) => {
+    const id = req.params.id
+    ClientService.Delete(id)
+    res.redirect("/clientes")  
+})
 
 //Rotas para produtos
 app.get("/produtos",(req,res)=>{
@@ -71,6 +98,34 @@ app.post("/createProduct", (req,res) =>{
     res.redirect("/produtos")
 })
 
+//rota do tipo excluir produto
+app.get("/deleteProduct/:id", (req, res) => {
+    const id = req.params.id
+    ProductService.Delete(id)
+    res.redirect("/produtos")  
+})
+
+// Rota do tipo buscar produto
+app.get("/findProduct/:id", (req, res) => {
+    const id = req.params.id
+    ProductService.GetOne(id).then(Product => {
+        res.render("dadosproduto", {
+            Product : Product
+        })
+    })
+})
+// Rota do tipo alterar produto
+app.post("/updateProduct/:id", (req, res) => {
+    ProductService.Update(
+        req.body.id,
+        req.body.name,
+        req.body.price,
+        req.body.category
+    )
+    res.redirect("/produtos")
+})
+
+
 //Rotas para Pedidos
 
 app.get("/pedidos",(req,res)=> {
@@ -89,6 +144,32 @@ app.post("/createOrder", (req,res)=>{
     res.redirect("/pedidos")
 })
 
+//Rota para buscar Pedido
+app.get("/findOrder/:id", (req, res) => {
+    const id = req.params.id
+    OrderService.GetOne(id).then(Order => {
+        res.render("dadospedido", {
+            Order : Order
+        })
+    })
+})
+
+//Rota para Excluir Pedido
+app.get("/deleteOrder/:id", (req, res) => {
+    const id = req.params.id
+    OrderService.Delete(id)
+    res.redirect("/pedidos")  
+})
+
+//Rota para alterar pedido
+app.post("/updateOrder/:id", (req, res) => {
+    OrderService.Update(
+        req.body.id,
+        req.body.code,
+        req.body.total
+    )
+    res.redirect("/pedidos")
+})
 
 // ROTA CLIENTES
 app.get("/clientes",function(req,res){

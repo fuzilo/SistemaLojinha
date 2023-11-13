@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-
 import client from "../models/Clients.js";
 
 const Client = mongoose.model("Client", client)
@@ -18,6 +17,31 @@ class ClientService{
     GetAll(){
        const clients= Client.find()
        return clients 
+    }
+    //Função Buscar 1
+    GetOne(id) {
+        const client = Client.findOne({_id: id})
+        return client
+    }
+
+    Delete(id) {
+        Client.findByIdAndDelete(id).then(() => {
+            console.log(`Cliente com a id: ${id} foi deletado.`)
+        }).catch(err => {
+            console.log(err)
+        })
+    }
+
+    Update(id, name, cpf, address) {
+        Client.findByIdAndUpdate(id, {
+            name: name,
+            cpf: cpf,
+            address: address
+        }).then(() => {
+            console.log(`Dados do cliente com id: ${id} alterados com sucesso.`)
+        }).catch(err => {
+            console.log(err)
+        })
     }
 }
 
