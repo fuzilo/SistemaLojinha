@@ -9,6 +9,13 @@ import bodyParser from 'body-parser'
 import ClientService from './services/ClientService.js'
 import OrderService from './services/OrderService.js'
 import ProductService from './services/ProductService.js'
+import UserService from './services/UserService.js'
+//importanto bcrypt (hash senha)
+import bcrypt from "bcrypt"
+//importando express-session
+import session from 'express-session'
+import Auth from './middleware/Auth.js'
+
 
 //decodifica dados recebidos por formulários
 app.use(bodyParser.urlencoded({extended:false}))
@@ -26,14 +33,78 @@ app.set('view engine', 'ejs')
 //Indicando ao express a pasta public para arquivos estáticos
 app.use(express.static("public"))
 
+//Indicando o express-session para gerador de sessões
+app.use(session({
+    secret:"lojasecret",
+    cookie:{maxAge: 30000}, // sessão expira em 30 seg
+    saveUninitialized:false,
+    resave:false
+}))
+
 // ROTA PRINCIPAL
 app.get("/",function(req,res){
     res.render("index")
 })
+//Rota de Login
+app.get("/login", (req, res)=>{
+    res.render("login")
+  })
+  
+  app.get("/cadastro", (req, res)=>{
+    res.render("cadastro")
+  })
+//rota de criação de usuario no banco
+
+app.post("/createUser", (req,res)=>{
+    const email = req.body.email
+    const password = req.body.password
+
+    UserService.GetOne(email).then(user =>{
+        if (user ==undefined){
+            const salt= bcrypt.genSaltSync(10)
+            const hash= bcrypt.hashSync(password, salt)
+
+            UserService.Create(email, hash)
+            res.redirect("/login")
+        }else{
+            res.send(`Usuário já cadastrado`)
+        }
+
+    })
+})
+
+//rota de autenticação
+
+app.post("/authenticate", (req,res)=>{
+    const email = req.body.email
+    const password = req.body.password
+
+    UserService.GetOne(email).then(user=>{
+
+        if (user != undefined){ //seusuario existe
+            //validar senha
+            const correct = bcrypt.compareSync(password,user.password)
+            if (correct){
+                //Autorizar o login 
+            req.session.user = {
+                id: user._id,
+                email: user.email
+            }
+            res.redirect("/")
+            }else{
+                //informar senha incorreta
+                req.send(`Senha inválida, você tem mais `)
+            }
+        }else{
+            //informa usuario incorreto
+            res.send("Usuário Inexistente")
+        }
+    })
+})
 
 //rota para clientes
 
-app.get("/clientes",(req,res)=> {
+app.get("/clientes",Auth,(req,res)=> {
     ClientService.GetAll().then(clients => {
         res.render("clientes", {
             clients : clients
@@ -43,7 +114,7 @@ app.get("/clientes",(req,res)=> {
 })
 
 //Criando Rota do tipo POST
-app.post("/createClient",(req, res) => {
+app.post("/createClient",Auth,(req, res) => {
     ClientService.Create(
         req.body.name,
         req.body.cpf,
@@ -53,7 +124,7 @@ app.post("/createClient",(req, res) => {
 })
 
 //Criando Rota do tipo Find Client
-app.get("/findClient/:id", (req, res) => {
+app.get("/findClient/:id", Auth,(req, res) => {
     const id = req.params.id
     ClientService.GetOne(id).then(Client => {
         res.render("dadoscliente", {
@@ -63,7 +134,7 @@ app.get("/findClient/:id", (req, res) => {
 })
 
 //Criando Rota do tipo Update Client
-app.post("/updateClient/:id", (req, res) => {
+app.post("/updateClient/:id", Auth,(req, res) => {
     ClientService.Update(
         req.body.id,
         req.body.name,
@@ -74,14 +145,14 @@ app.post("/updateClient/:id", (req, res) => {
 })
 
 //Criando Rota do Tipo Delete Client
-app.get("/deleteClient/:id", (req, res) => {
+app.get("/deleteClient/:id",Auth, (req, res) => {
     const id = req.params.id
     ClientService.Delete(id)
     res.redirect("/clientes")  
 })
 
 //Rotas para produtos
-app.get("/produtos",(req,res)=>{
+app.get("/produtos",Auth,(req,res)=>{
     ProductService.GetAll().then(products=>{
         res.render("produtos",{
             products:products
@@ -89,7 +160,7 @@ app.get("/produtos",(req,res)=>{
     } )
 })
 
-app.post("/createProduct", (req,res) =>{
+app.post("/createProduct",Auth, (req,res) =>{
     ProductService.Create(
         req.body.name,
         req.body.price,
@@ -99,14 +170,14 @@ app.post("/createProduct", (req,res) =>{
 })
 
 //rota do tipo excluir produto
-app.get("/deleteProduct/:id", (req, res) => {
+app.get("/deleteProduct/:id", Auth,(req, res) => {
     const id = req.params.id
     ProductService.Delete(id)
     res.redirect("/produtos")  
 })
 
 // Rota do tipo buscar produto
-app.get("/findProduct/:id", (req, res) => {
+app.get("/findProduct/:id",Auth, (req, res) => {
     const id = req.params.id
     ProductService.GetOne(id).then(Product => {
         res.render("dadosproduto", {
@@ -115,7 +186,7 @@ app.get("/findProduct/:id", (req, res) => {
     })
 })
 // Rota do tipo alterar produto
-app.post("/updateProduct/:id", (req, res) => {
+app.post("/updateProduct/:id", Auth,(req, res) => {
     ProductService.Update(
         req.body.id,
         req.body.name,
@@ -128,7 +199,7 @@ app.post("/updateProduct/:id", (req, res) => {
 
 //Rotas para Pedidos
 
-app.get("/pedidos",(req,res)=> {
+app.get("/pedidos",Auth,(req,res)=> {
     OrderService.GetAll().then(orders =>{
         res.render("pedidos",{
             orders:orders
@@ -136,7 +207,7 @@ app.get("/pedidos",(req,res)=> {
     })
 })
 
-app.post("/createOrder", (req,res)=>{
+app.post("/createOrder",Auth, (req,res)=>{
     OrderService.Create(
         req.body.code,
         req.body.total
@@ -145,7 +216,7 @@ app.post("/createOrder", (req,res)=>{
 })
 
 //Rota para buscar Pedido
-app.get("/findOrder/:id", (req, res) => {
+app.get("/findOrder/:id", Auth,(req, res) => {
     const id = req.params.id
     OrderService.GetOne(id).then(Order => {
         res.render("dadospedido", {
@@ -155,14 +226,14 @@ app.get("/findOrder/:id", (req, res) => {
 })
 
 //Rota para Excluir Pedido
-app.get("/deleteOrder/:id", (req, res) => {
+app.get("/deleteOrder/:id", Auth,(req, res) => {
     const id = req.params.id
     OrderService.Delete(id)
     res.redirect("/pedidos")  
 })
 
 //Rota para alterar pedido
-app.post("/updateOrder/:id", (req, res) => {
+app.post("/updateOrder/:id",Auth, (req, res) => {
     OrderService.Update(
         req.body.id,
         req.body.code,
