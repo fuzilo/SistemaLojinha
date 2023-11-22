@@ -36,13 +36,13 @@ app.use(express.static("public"))
 //Indicando o express-session para gerador de sessões
 app.use(session({
     secret:"lojasecret",
-    cookie:{maxAge: 30000}, // sessão expira em 30 seg
+    cookie:{maxAge: 9005005050}, // sessão expira em 30 seg
     saveUninitialized:false,
     resave:false
 }))
 
 // ROTA PRINCIPAL
-app.get("/",function(req,res){
+app.get("/",Auth,function(req,res){
     res.render("index")
 })
 //Rota de Login
@@ -50,6 +50,14 @@ app.get("/login", (req, res)=>{
     res.render("login")
   })
   
+
+  //Rota de Logout
+app.get("/logout", (req,res)=> {
+    req.session.user = undefined
+    res.redirect("login")
+})
+
+
   app.get("/cadastro", (req, res)=>{
     res.render("cadastro")
   })

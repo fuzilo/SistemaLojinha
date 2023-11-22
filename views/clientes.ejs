@@ -44,8 +44,8 @@
                         <td><%= client.name %></td>
                         <td><%= client.cpf %></td>
                         <td><%= client.address %></td>
-                        <td><a href="/deleteClient/<%= Client._id %>"><img src="/imgs/delete.png" alt="Apagar"></a></td>
-                        <td><a href="/findClient/<%= Client._id %>"><img src="/imgs/edit.png" alt="Editar"></a></td>
+                        <td><a href="/deleteClient/<%= client._id %>"><img src="/imgs/delete.png" alt="Apagar"></a></td>
+                        <td><a href="/findClient/<%= client._id %>"><img src="/imgs/edit.png" alt="Editar"></a></td>
                     </tr>
                     <% }) %>
                 </tbody>

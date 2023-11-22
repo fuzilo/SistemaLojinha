@@ -46,7 +46,7 @@
                         <% products.forEach(product => { %>
                         <tr>
                             <td><%= product.name %></td>
-                            <td><%= product.price.toLocaleString('pt-br', {style: 'currency', currency: 'BRL'}) %></td>
+                            <td><%= product.price.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td>
                             <td><%= product.category %></td>
                             <td><a href="/deleteProduct/<%= product._id %>"><img src="/imgs/delete.png" alt="Apagar"></a></td>
                             <td><a href="/findProduct/<%= product._id %>"><img src="/imgs/edit.png" alt="Editar"></a></td>
